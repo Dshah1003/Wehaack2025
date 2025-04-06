@@ -1,23 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { analyzeInvestment } from '../api'; // API call
 
 const InvestmentSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [investmentType, setInvestmentType] = useState('');
-  const [companyData, setCompanyData] = useState({
-    companyName: 'Company XYZ',
-    fraudRiskScore: '30%',
-    marketVolatility: '15%',
-    liquidityRisk: '10%',
-    riskScore: '85%',
-    suggestedActions: 'Diversify portfolio, reduce exposure to high-risk assets',
-    sentiment: 'Neutral',
-    headlines: [
-      "Company XYZ hits new high in Q1",
-      "Regulatory changes expected to impact market",
-      "Analysts predict strong growth ahead"
-    ]
-  });
+  const [companyData, setCompanyData] = useState(null);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -27,9 +15,29 @@ const InvestmentSearch = () => {
     setInvestmentType(e.target.value);
   };
 
-  const handleSubmit = () => {
-    console.log('Search Query:', searchQuery);
-    console.log('Selected Investment Type:', investmentType);
+  const handleSubmit = async () => {
+    try {
+      const result = await analyzeInvestment({ ticker: searchQuery, type: investmentType });
+
+      if (result.error) {
+        alert("Error fetching data. Please check ticker or backend.");
+        return;
+      }
+
+      setCompanyData({
+        companyName: result.company_name || searchQuery.toUpperCase(),
+        fraudRiskScore: result.fraud_news_risk + "%",
+        marketVolatility: result.market_risk + "%",
+        liquidityRisk: result.liquidity_risk + "%",
+        riskScore: result.final_risk_score + "%",
+        suggestedActions: (result.critical_alerts || []).join("\n"),
+        sentiment: result.sentiment,
+        headlines: result.headlines || [],
+      });
+    } catch (err) {
+      console.error("API call failed:", err);
+      alert("Something went wrong while fetching investment data.");
+    }
   };
 
   return (
@@ -56,7 +64,7 @@ const InvestmentSearch = () => {
       <div style={styles.contentContainer}>
         <h2 style={styles.pageTitle}>Investment Search</h2>
 
-        {/* Search and Dropdown Container */}
+        {/* Search and Dropdown */}
         <div style={styles.searchContainer}>
           <input
             type="text"
@@ -82,52 +90,56 @@ const InvestmentSearch = () => {
           </button>
         </div>
 
-        {/* Risk and Company Info Container */}
-        <div style={styles.riskContainer}>
-          {/* Risk Diagram */}
-          <div style={styles.diagram}>
-            <div style={styles.riskLabel}>Risk Diagram</div>
-            <div style={styles.riskBar}>
-              <div
-                style={{
+        {/* Result */}
+        {companyData && (
+          <div style={styles.riskContainer}>
+            {/* Total Risk Score */}
+            <div style={styles.diagram}>
+              <div style={styles.riskLabel}>Total Risk Score</div>
+              <div style={styles.riskBar}>
+                <div style={{
                   ...styles.riskBarFill,
                   width: companyData.riskScore,
-                }}
-              ></div>
-            </div>
-            <div style={styles.riskPercentage}>{companyData.riskScore}</div>
+                }} />
+              </div>
+              <div style={styles.riskPercentage}>{companyData.riskScore}</div>
 
-            {/* Top Headlines (moved here) */}
-            <div style={styles.headlinesSection}>
-              <h3 style={styles.headlinesTitle}>Top Headlines</h3>
-              <ul style={styles.headlinesList}>
-                {companyData.headlines.map((headline, index) => (
-                  <li key={index} style={styles.headlineItem}>{headline}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* White Gradient Box for Company Info */}
-          <div style={styles.companyInfoBox}>
-            <div style={styles.companyInfo}>
-              <h3 style={styles.companyName}>{companyData.companyName}</h3>
-              <div style={styles.companyDetails}>
-                <div><strong>Fraud Risk Score:</strong> {companyData.fraudRiskScore}</div>
-                <div><strong>Market Volatility:</strong> {companyData.marketVolatility}</div>
-                <div><strong>Liquidity Risk:</strong> {companyData.liquidityRisk}</div>
+              {/* Headlines */}
+              <div style={styles.headlinesSection}>
+                <h3 style={styles.headlinesTitle}>Top Headlines</h3>
+                <ul style={styles.headlinesList}>
+                  {companyData.headlines.map((headline, index) => (
+                    <li key={index} style={styles.headlineItem}>{headline}</li>
+                  ))}
+                </ul>
               </div>
             </div>
 
-            {/* Analyze Data */}
-            <div style={styles.analyzeData}>
-              <h4>Analyze Data</h4>
-              <div><strong>Risk Score:</strong> {companyData.riskScore}</div>
-              <div><strong>Suggested Actions:</strong> {companyData.suggestedActions}</div>
-              <div><strong>Sentiment:</strong> {companyData.sentiment}</div>
+            {/* Company Info */}
+            <div style={styles.companyInfoBox}>
+              <div style={styles.companyInfo}>
+                <h3 style={styles.companyName}>{companyData.companyName}</h3>
+                <div style={styles.companyDetails}>
+                  <div><strong>Fraud Risk Score:</strong> {companyData.fraudRiskScore}</div>
+                  <div><strong>Market Volatility:</strong> {companyData.marketVolatility}</div>
+                  <div><strong>Liquidity Risk:</strong> {companyData.liquidityRisk}</div>
+                </div>
+              </div>
+
+              <div style={styles.analyzeData}>
+                <h4>Analyze Data</h4>
+                <div><strong>Risk Score:</strong> {companyData.riskScore}</div>
+                <div>
+                <strong>Suggested Actions:</strong>
+                <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', margin: 0 }}>
+                {companyData.suggestedActions}
+                </pre>
+                </div>
+                <div><strong>Sentiment:</strong> {companyData.sentiment}</div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -291,6 +303,9 @@ const styles = {
     fontSize: '16px',
     color: '#0f3d3e',
     marginTop: '20px',
+    whiteSpace: 'pre-wrap',
+    wordWrap: 'break-word',
+    overflowWrap: 'break-word',
   },
   headlinesSection: {
     marginTop: '30px',
