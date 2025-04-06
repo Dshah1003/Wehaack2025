@@ -6,9 +6,12 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import os
 import logging
 from sec_utils import download_sec_filings, analyze_sec_text_for_flags
+from flask_cors import CORS
+
 
 # Setup
 app = Flask(__name__)
+CORS(app)
 NEWS_API_KEY = os.getenv("NEWS_API_KEY_V2")
 logging.basicConfig(level=logging.INFO)
 
