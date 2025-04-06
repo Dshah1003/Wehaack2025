@@ -126,13 +126,25 @@ def analyze():
         # ===== CRITICAL ALERT SYSTEM =====
         critical_alerts = []
         if final_risk_score < 30:
-            critical_alerts.append("This investment is considered low risk, with minimal red flags. Suitable for conservative portfolios.")
+            critical_alerts.append("This investment is considered low risk, with minimal red flags. Suitable for conservative portfolios.\n"
+                                   "Suggested Actions:\nHold for long-term growth.\n"
+                                   "Reassess periodically")
         elif final_risk_score < 60:
-            critical_alerts.append("Moderate risk: A good balance between growth potential and risk. Stay informed.")
+            critical_alerts.append("Moderate risk: A good balance between growth potential and risk. Stay informed.\n"
+                                   "Suggested Actions:\nDiversify further\n"
+                                   "Monitor quarterly reports\n"
+                                   "Set price alerts")
         elif final_risk_score < 85:
-            critical_alerts.append("High risk due to volatility, liquidity issues, or legal concerns. Consider risk mitigation.")
+            critical_alerts.append("High risk due to volatility, liquidity issues, or legal concerns. Consider risk mitigation.\n"
+                                   "Suggested Actions:\nLimit Exposure\n"
+                                   "Research thoroughly\n"
+                                   "Set stop-loss orders\n")
         elif final_risk_score <= 100:
-            critical_alerts.append("Extreme risk including potential fraud or financial distress. Immediate review advised.")
+            critical_alerts.append("Extreme risk including potential fraud or financial distress. Immediate review advised.\n"
+                                   "Suggested Actions:\nExit or avoid.\n"
+                                   "Verify sources\n"
+                                   "Exit or avoid\n"
+                                   "Seek expert advice\n")
 
         return jsonify({
             "status": "success",
