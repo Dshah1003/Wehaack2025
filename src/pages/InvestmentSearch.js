@@ -3,13 +3,20 @@ import { Link } from 'react-router-dom';
 
 const InvestmentSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [investmentType, setInvestmentType] = useState(''); // Default value is empty for showing "Type"
+  const [investmentType, setInvestmentType] = useState('');
   const [companyData, setCompanyData] = useState({
-    companyName: 'Company XYZ', // Example company name
-    fraudRiskScore: '30%', // Example value
-    marketVolatility: '15%', // Example value
-    liquidityRisk: '10%', // Example value
-    riskScore: '85%' // Example value
+    companyName: 'Company XYZ',
+    fraudRiskScore: '30%',
+    marketVolatility: '15%',
+    liquidityRisk: '10%',
+    riskScore: '85%',
+    suggestedActions: 'Diversify portfolio, reduce exposure to high-risk assets',
+    sentiment: 'Neutral',
+    headlines: [
+      "Company XYZ hits new high in Q1",
+      "Regulatory changes expected to impact market",
+      "Analysts predict strong growth ahead"
+    ]
   });
 
   const handleSearchChange = (e) => {
@@ -21,7 +28,6 @@ const InvestmentSearch = () => {
   };
 
   const handleSubmit = () => {
-    // Handle the submit action here
     console.log('Search Query:', searchQuery);
     console.log('Selected Investment Type:', investmentType);
   };
@@ -52,7 +58,6 @@ const InvestmentSearch = () => {
 
         {/* Search and Dropdown Container */}
         <div style={styles.searchContainer}>
-          {/* Search Bar */}
           <input
             type="text"
             value={searchQuery}
@@ -61,41 +66,50 @@ const InvestmentSearch = () => {
             style={styles.searchInput}
           />
 
-          {/* Type of Investment Dropdown */}
           <select
             value={investmentType}
             onChange={handleInvestmentTypeChange}
             style={styles.dropdown}
           >
-            <option value="">Type</option> {/* Default option */}
+            <option value="">Type</option>
             <option value="Stock">Stock</option>
             <option value="ETF">ETF</option>
             <option value="Real Estate">Real Estate</option>
           </select>
 
-          {/* Submit Button */}
           <button onClick={handleSubmit} style={styles.submitButton}>
             Submit
           </button>
         </div>
 
-        {/* Risk Percentage Diagram */}
+        {/* Risk and Company Info Container */}
         <div style={styles.riskContainer}>
+          {/* Risk Diagram */}
           <div style={styles.diagram}>
             <div style={styles.riskLabel}>Risk Diagram</div>
             <div style={styles.riskBar}>
               <div
                 style={{
                   ...styles.riskBarFill,
-                  width: companyData.riskScore, // Set width based on risk score
+                  width: companyData.riskScore,
                 }}
               ></div>
             </div>
             <div style={styles.riskPercentage}>{companyData.riskScore}</div>
+
+            {/* Top Headlines (moved here) */}
+            <div style={styles.headlinesSection}>
+              <h3 style={styles.headlinesTitle}>Top Headlines</h3>
+              <ul style={styles.headlinesList}>
+                {companyData.headlines.map((headline, index) => (
+                  <li key={index} style={styles.headlineItem}>{headline}</li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          {/* Company Information */}
-          <div style={styles.companyInfoContainer}>
+          {/* White Gradient Box for Company Info */}
+          <div style={styles.companyInfoBox}>
             <div style={styles.companyInfo}>
               <h3 style={styles.companyName}>{companyData.companyName}</h3>
               <div style={styles.companyDetails}>
@@ -105,10 +119,12 @@ const InvestmentSearch = () => {
               </div>
             </div>
 
-            {/* Analyze Data Section */}
+            {/* Analyze Data */}
             <div style={styles.analyzeData}>
               <h4>Analyze Data</h4>
               <div><strong>Risk Score:</strong> {companyData.riskScore}</div>
+              <div><strong>Suggested Actions:</strong> {companyData.suggestedActions}</div>
+              <div><strong>Sentiment:</strong> {companyData.sentiment}</div>
             </div>
           </div>
         </div>
@@ -223,7 +239,7 @@ const styles = {
     marginTop: '40px',
     justifyContent: 'space-between',
     width: '80%',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   diagram: {
     width: '45%',
@@ -250,11 +266,13 @@ const styles = {
     fontSize: '20px',
     color: '#0f3d3e',
   },
-  companyInfoContainer: {
+  companyInfoBox: {
     width: '45%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
+    background: 'linear-gradient(to bottom right, #f7f9fc, #e0f7fa)',
+    borderRadius: '10px',
+    padding: '20px',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    textAlign: 'left',
   },
   companyInfo: {
     marginBottom: '20px',
@@ -273,6 +291,29 @@ const styles = {
     fontSize: '16px',
     color: '#0f3d3e',
     marginTop: '20px',
+  },
+  headlinesSection: {
+    marginTop: '30px',
+    padding: '20px',
+    background: 'linear-gradient(to bottom right, #ffffff, #e8f5f6)',
+    borderRadius: '10px',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    textAlign: 'left',
+  },
+  headlinesTitle: {
+    fontSize: '22px',
+    fontWeight: 'bold',
+    color: '#0f3d3e',
+    marginBottom: '10px',
+  },
+  headlinesList: {
+    listStyleType: 'disc',
+    paddingLeft: '20px',
+    fontSize: '15px',
+    color: '#333',
+  },
+  headlineItem: {
+    marginBottom: '6px',
   },
 };
 
