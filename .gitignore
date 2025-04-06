@@ -1,0 +1,13 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore downloaded SEC filings
+sec-edgar-filings/
+
+# Ignore virtual environment
+venv/
+
+# Ignore any system files (Windows/macOS)
+*.DS_Store
+Thumbs.db
